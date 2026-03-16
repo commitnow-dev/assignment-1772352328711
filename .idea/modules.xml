@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/content-service/popular-content-platform.content-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/content-service/popular-content-platform.content-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/query-service/popular-content-platform.query-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/query-service/popular-content-platform.query-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ranking-service/popular-content-platform.ranking-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/ranking-service/popular-content-platform.ranking-service.main.iml" />
+    </modules>
+  </component>
+</project>

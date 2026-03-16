@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: ranking-service
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: popular_ranking
+      username: root
+      password: root
+      authentication-database: admin
+
+server:
+  port: 8082
