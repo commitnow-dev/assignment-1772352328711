@@ -2,9 +2,16 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/content-service/popular-content-platform.content-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/content-service/popular-content-platform.content-service.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/query-service/popular-content-platform.query-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/query-service/popular-content-platform.query-service.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ranking-service/popular-content-platform.ranking-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/ranking-service/popular-content-platform.ranking-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/content-service/com.example.popular-content-platform.content-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/content-service/com.example.popular-content-platform.content-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/query-service/com.example.popular-content-platform.query-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/query-service/com.example.popular-content-platform.query-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ranking-service/com.example.popular-content-platform.ranking-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/ranking-service/com.example.popular-content-platform.ranking-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/popular-content-platform.iml" filepath="$PROJECT_DIR$/.idea/modules/popular-content-platform.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/content-service/popular-content-platform.content-service.iml" filepath="$PROJECT_DIR$/.idea/modules/content-service/popular-content-platform.content-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/content-service/popular-content-platform.content-service.test.iml" filepath="$PROJECT_DIR$/.idea/modules/content-service/popular-content-platform.content-service.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/query-service/popular-content-platform.query-service.iml" filepath="$PROJECT_DIR$/.idea/modules/query-service/popular-content-platform.query-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/query-service/popular-content-platform.query-service.test.iml" filepath="$PROJECT_DIR$/.idea/modules/query-service/popular-content-platform.query-service.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ranking-service/popular-content-platform.ranking-service.iml" filepath="$PROJECT_DIR$/.idea/modules/ranking-service/popular-content-platform.ranking-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ranking-service/popular-content-platform.ranking-service.test.iml" filepath="$PROJECT_DIR$/.idea/modules/ranking-service/popular-content-platform.ranking-service.test.iml" />
     </modules>
   </component>
 </project>
