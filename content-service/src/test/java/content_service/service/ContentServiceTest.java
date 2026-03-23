@@ -1,13 +1,12 @@
 package content_service.service;
 
-import content_service.controller.dto.ContentCreateRequest;
-import content_service.controller.dto.ContentCreateResponse;
-import content_service.controller.dto.ContentUpdateRequest;
-import content_service.controller.dto.ContentUpdateResponse;
+import content_service.controller.dto.*;
 import content_service.domain.Category;
 import content_service.domain.Content;
+import content_service.domain.UserLike;
 import content_service.exception.ContentNotFoundException;
 import content_service.repository.ContentRepository;
+import content_service.repository.UserLikeRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +33,9 @@ class ContentServiceTest {
 
     @Mock
     private ContentRepository contentRepository;
+
+    @Mock
+    private UserLikeRepository userLikeRepository;
 
     @Test
     @DisplayName("title, category, body를 전달하면 Content를 저장하고 저장된 정보를 반환한다")
@@ -120,4 +122,60 @@ class ContentServiceTest {
                 .isInstanceOf(ContentNotFoundException.class)
                 .hasMessage("콘텐츠를 찾을 수 없습니다. id=" + contentId);
     }
+
+    @Test
+    @DisplayName("좋아요 이력이 없으면 UserLike를 저장하고 liked: true를 반환한다")
+    void toggleLike_likeAdded() {
+        // given
+        Long contentId = 1L;
+        LikeRequest request = new LikeRequest("u123");
+
+        given(contentRepository.existsById(contentId)).willReturn(true);
+        given(userLikeRepository.findByContentIdAndUserId(contentId, "u123")).willReturn(Optional.empty());
+
+        // when
+        LikeResponse response = contentService.toggleLike(contentId, request);
+
+        // then
+        assertThat(response.contentId()).isEqualTo(contentId);
+        assertThat(response.liked()).isTrue();
+        then(userLikeRepository).should(times(1)).save(any(UserLike.class));
+        then(contentRepository).should(times(1)).incrementLikeCount(contentId);
+    }
+
+    @Test
+    @DisplayName("이미 좋아요한 이력이 있으면 UserLike를 삭제하고 liked: false를 반환한다")
+    void toggleLike_likeRemoved() {
+        // given
+        Long contentId = 1L;
+        LikeRequest request = new LikeRequest("u123");
+
+        given(contentRepository.existsById(contentId)).willReturn(true);
+        given(userLikeRepository.findByContentIdAndUserId(contentId, "u123")).willReturn(Optional.of(UserLike.create(contentId, "u123")));
+
+        // when
+        LikeResponse response = contentService.toggleLike(contentId, request);
+
+        // then
+        assertThat(response.contentId()).isEqualTo(contentId);
+        assertThat(response.liked()).isFalse();
+        then(userLikeRepository).should(times(1)).deleteByContentIdAndUserId(contentId, "u123");
+        then(contentRepository).should(times(1)).decrementLikeCount(contentId);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 contentId로 좋아요 요청 시 ContentNotFoundException이 발생한다")
+    void toggleLike_contentNotFound_throwsException() {
+        // given
+        Long contentId = 999L;
+        LikeRequest request = new LikeRequest("u123");
+
+        given(contentRepository.existsById(contentId)).willReturn(false);
+
+        // when & then
+        assertThatThrownBy(() -> contentService.toggleLike(contentId, request))
+                .isInstanceOf(ContentNotFoundException.class)
+                .hasMessage("콘텐츠를 찾을 수 없습니다. id=" + contentId);
+    }
 }
+

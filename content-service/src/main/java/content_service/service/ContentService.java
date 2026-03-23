@@ -1,12 +1,11 @@
 package content_service.service;
 
-import content_service.controller.dto.ContentCreateRequest;
-import content_service.controller.dto.ContentCreateResponse;
-import content_service.controller.dto.ContentUpdateRequest;
-import content_service.controller.dto.ContentUpdateResponse;
+import content_service.controller.dto.*;
 import content_service.domain.Content;
+import content_service.domain.UserLike;
 import content_service.exception.ContentNotFoundException;
 import content_service.repository.ContentRepository;
+import content_service.repository.UserLikeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ContentService {
 
     private final ContentRepository contentRepository;
+    private final UserLikeRepository userLikeRepository;
 
     @Transactional
     public ContentCreateResponse createContent(ContentCreateRequest request) {
@@ -39,5 +39,24 @@ public class ContentService {
         Content content = contentRepository.findById(contentId)
                 .orElseThrow(() -> new ContentNotFoundException(contentId));
         contentRepository.delete(content);
+    }
+
+    @Transactional
+    public LikeResponse toggleLike(Long contentId, LikeRequest request) {
+        if (!contentRepository.existsById(contentId)) {
+            throw new ContentNotFoundException(contentId);
+        }
+
+        boolean alreadyLiked = userLikeRepository.findByContentIdAndUserId(contentId, request.userId()).isPresent();
+
+        if (alreadyLiked) {
+            userLikeRepository.deleteByContentIdAndUserId(contentId, request.userId());
+            contentRepository.decrementLikeCount(contentId);
+            return new LikeResponse(contentId, false);
+        }
+
+        userLikeRepository.save(UserLike.create(contentId, request.userId()));
+        contentRepository.incrementLikeCount(contentId);
+        return new LikeResponse(contentId, true);
     }
 }

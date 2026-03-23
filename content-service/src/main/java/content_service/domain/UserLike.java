@@ -1,11 +1,17 @@
 package content_service.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "user_likes")
+@Table(
+        name = "user_likes",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"contentId", "userId"})
+)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserLike {
 
     @Id
@@ -13,5 +19,12 @@ public class UserLike {
     private Long id;
 
     private Long contentId;
-    private Long userId;
+    private String userId;
+
+    public static UserLike create(Long contentId, String userId) {
+        UserLike userLike = new UserLike();
+        userLike.contentId = contentId;
+        userLike.userId = userId;
+        return userLike;
+    }
 }
