@@ -4,7 +4,10 @@ import content_service.controller.dto.*;
 import content_service.domain.Category;
 import content_service.domain.Content;
 import content_service.domain.UserLike;
+import content_service.event.EventPayload;
+import content_service.event.LikeEventType;
 import content_service.exception.ContentNotFoundException;
+import content_service.outbox.OutboxEventPublisher;
 import content_service.repository.ContentRepository;
 import content_service.repository.UserLikeRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +24,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
@@ -36,6 +40,9 @@ class ContentServiceTest {
 
     @Mock
     private UserLikeRepository userLikeRepository;
+
+    @Mock
+    private OutboxEventPublisher outboxEventPublisher;
 
     @Test
     @DisplayName("title, category, body를 전달하면 Content를 저장하고 저장된 정보를 반환한다")
@@ -141,7 +148,7 @@ class ContentServiceTest {
         assertThat(response.liked()).isTrue();
         then(userLikeRepository).should(times(1)).save(any(UserLike.class));
         then(contentRepository).should(times(1)).incrementLikeCount(contentId);
-    }
+        then(outboxEventPublisher).should(times(1)).publish(eq(LikeEventType.LIKE_ADDED), any(EventPayload.class));    }
 
     @Test
     @DisplayName("이미 좋아요한 이력이 있으면 UserLike를 삭제하고 liked: false를 반환한다")
@@ -161,6 +168,7 @@ class ContentServiceTest {
         assertThat(response.liked()).isFalse();
         then(userLikeRepository).should(times(1)).deleteByContentIdAndUserId(contentId, "u123");
         then(contentRepository).should(times(1)).decrementLikeCount(contentId);
+        then(outboxEventPublisher).should(times(1)).publish(eq(LikeEventType.LIKE_REMOVED), any(EventPayload.class));
     }
 
     @Test

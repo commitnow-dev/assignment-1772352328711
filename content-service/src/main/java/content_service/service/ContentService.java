@@ -3,7 +3,10 @@ package content_service.service;
 import content_service.controller.dto.*;
 import content_service.domain.Content;
 import content_service.domain.UserLike;
+import content_service.event.LikeEvent;
+import content_service.event.LikeEventType;
 import content_service.exception.ContentNotFoundException;
+import content_service.outbox.OutboxEventPublisher;
 import content_service.repository.ContentRepository;
 import content_service.repository.UserLikeRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +19,7 @@ public class ContentService {
 
     private final ContentRepository contentRepository;
     private final UserLikeRepository userLikeRepository;
+    private final OutboxEventPublisher outboxEventPublisher;
 
     @Transactional
     public ContentCreateResponse createContent(ContentCreateRequest request) {
@@ -52,11 +56,15 @@ public class ContentService {
         if (alreadyLiked) {
             userLikeRepository.deleteByContentIdAndUserId(contentId, request.userId());
             contentRepository.decrementLikeCount(contentId);
+            outboxEventPublisher.publish(LikeEventType.LIKE_REMOVED, LikeEvent.of(contentId, request.userId(), LikeEventType.LIKE_REMOVED));
+
             return new LikeResponse(contentId, false);
         }
 
         userLikeRepository.save(UserLike.create(contentId, request.userId()));
         contentRepository.incrementLikeCount(contentId);
+        outboxEventPublisher.publish(LikeEventType.LIKE_ADDED, LikeEvent.of(contentId, request.userId(), LikeEventType.LIKE_ADDED));
+
         return new LikeResponse(contentId, true);
     }
 }

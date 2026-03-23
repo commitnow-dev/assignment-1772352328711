@@ -3,6 +3,7 @@ package content_service.service;
 import content_service.controller.dto.LikeRequest;
 import content_service.domain.Category;
 import content_service.domain.Content;
+import content_service.outbox.OutboxEventPublisher;
 import content_service.repository.ContentRepository;
 import content_service.repository.UserLikeRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -31,6 +32,9 @@ class LikeConcurrencyTest {
 
     @Autowired
     private UserLikeRepository userLikeRepository;
+
+    @MockitoBean
+    private OutboxEventPublisher outboxEventPublisher;
 
     private Long contentId;
 
