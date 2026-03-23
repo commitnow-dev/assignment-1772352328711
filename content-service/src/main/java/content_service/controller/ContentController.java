@@ -1,9 +1,6 @@
 package content_service.controller;
 
-import content_service.controller.dto.ContentCreateRequest;
-import content_service.controller.dto.ContentCreateResponse;
-import content_service.controller.dto.ContentUpdateRequest;
-import content_service.controller.dto.ContentUpdateResponse;
+import content_service.controller.dto.*;
 import content_service.service.ContentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,5 +32,12 @@ public class ContentController {
     public ResponseEntity<Void> deleteContent(@PathVariable Long contentId) {
         contentService.deleteContent(contentId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{contentId}/likes")
+    public ResponseEntity<LikeResponse> toggleLike(@PathVariable Long contentId,
+                                                   @Valid @RequestBody LikeRequest request) {
+        LikeResponse response = contentService.toggleLike(contentId, request);
+        return ResponseEntity.ok(response);
     }
 }
