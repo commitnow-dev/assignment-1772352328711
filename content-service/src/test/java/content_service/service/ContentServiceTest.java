@@ -16,9 +16,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,6 +47,65 @@ class ContentServiceTest {
 
     @Mock
     private OutboxEventPublisher outboxEventPublisher;
+
+    @Test
+    @DisplayName("존재하는 contentId를 전달하면 ContentDetailResponse를 반환한다")
+    void getContent_success() {
+        // given
+        Long contentId = 1L;
+        Content content = Content.create("제목", Category.TECH, "본문");
+        ReflectionTestUtils.setField(content, "id", contentId);
+        ReflectionTestUtils.setField(content, "likeCount", 5);
+        ReflectionTestUtils.setField(content, "createdAt", LocalDateTime.of(2026, 3, 24, 0, 0));
+        ReflectionTestUtils.setField(content, "updatedAt", LocalDateTime.of(2026, 3, 24, 0, 0));
+
+        given(contentRepository.findById(contentId)).willReturn(Optional.of(content));
+
+        // when
+        ContentDetailResponse response = contentService.getContent(contentId);
+
+        // then
+        assertThat(response.contentId()).isEqualTo(contentId);
+        assertThat(response.title()).isEqualTo("제목");
+        assertThat(response.body()).isEqualTo("본문");
+        assertThat(response.likeCount()).isEqualTo(5);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 contentId로 조회하면 ContentNotFoundException이 발생한다")
+    void getContent_notFound_throwsException() {
+        // given
+        Long contentId = 999L;
+        given(contentRepository.findById(contentId)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> contentService.getContent(contentId))
+                .isInstanceOf(ContentNotFoundException.class)
+                .hasMessage("콘텐츠를 찾을 수 없습니다. id=" + contentId);
+    }
+
+    @Test
+    @DisplayName("페이지 요청을 전달하면 ContentSummaryResponse 목록을 반환한다")
+    void getContents_success() {
+        // given
+        Content content = Content.create("제목", Category.TECH, "본문");
+        ReflectionTestUtils.setField(content, "id", 1L);
+        ReflectionTestUtils.setField(content, "likeCount", 3);
+        ReflectionTestUtils.setField(content, "createdAt", LocalDateTime.of(2026, 3, 24, 0, 0));
+
+        PageRequest pageable = PageRequest.of(0, 20);
+        Page<Content> page = new PageImpl<>(List.of(content), pageable, 1);
+        given(contentRepository.findAll(pageable)).willReturn(page);
+
+        // when
+        Page<ContentSummaryResponse> result = contentService.getContents(pageable);
+
+        // then
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getContent().get(0).contentId()).isEqualTo(1L);
+        assertThat(result.getContent().get(0).title()).isEqualTo("제목");
+        assertThat(result.getContent().get(0).likeCount()).isEqualTo(3);
+    }
 
     @Test
     @DisplayName("title, category, body를 전달하면 Content를 저장하고 저장된 정보를 반환한다")

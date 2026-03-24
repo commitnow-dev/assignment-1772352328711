@@ -4,6 +4,8 @@ import content_service.controller.dto.*;
 import content_service.service.ContentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,18 @@ import org.springframework.web.bind.annotation.*;
 public class ContentController {
 
     private final ContentService contentService;
+
+    @GetMapping("/{contentId}")
+    public ResponseEntity<ContentDetailResponse> getContent(@PathVariable Long contentId) {
+        return ResponseEntity.ok(contentService.getContent(contentId));
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<ContentSummaryResponse>> getContents(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(contentService.getContents(PageRequest.of(page, size)));
+    }
 
     @PostMapping
     public ResponseEntity<ContentCreateResponse> createContent(@Valid @RequestBody ContentCreateRequest request) {

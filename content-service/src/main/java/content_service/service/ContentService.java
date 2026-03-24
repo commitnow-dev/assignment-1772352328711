@@ -10,6 +10,8 @@ import content_service.outbox.OutboxEventPublisher;
 import content_service.repository.ContentRepository;
 import content_service.repository.UserLikeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,16 @@ public class ContentService {
     private final ContentRepository contentRepository;
     private final UserLikeRepository userLikeRepository;
     private final OutboxEventPublisher outboxEventPublisher;
+
+    public ContentDetailResponse getContent(Long contentId) {
+        Content content = contentRepository.findById(contentId)
+                .orElseThrow(() -> new ContentNotFoundException(contentId));
+        return ContentDetailResponse.from(content);
+    }
+
+    public Page<ContentSummaryResponse> getContents(Pageable pageable) {
+        return contentRepository.findAll(pageable).map(ContentSummaryResponse::from);
+    }
 
     @Transactional
     public ContentCreateResponse createContent(ContentCreateRequest request) {
