@@ -9,6 +9,16 @@ spring:
       username: root
       password: root
       authentication-database: admin
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: ranking-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
 
 server:
   port: 8082
