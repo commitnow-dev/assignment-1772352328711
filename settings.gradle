@@ -1,0 +1,5 @@
+rootProject.name = 'popular-content-platform'
+
+include 'content-service'
+include 'query-service'
+include 'ranking-service'
